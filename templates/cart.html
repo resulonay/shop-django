@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Zay Shop Cart</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="apple-touch-icon" href="{% static 'assets/img/apple-icon.png' %}">
+  <link rel="shortcut icon" type="image/x-icon" href="{% static 'assets/img/favicon.ico' %}">
+
+  <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'assets/css/templatemo.css' %}">
+  <link rel="stylesheet" href="{% static 'assets/css/custom.css' %}">
+  
+
+  <!-- Load fonts style after rendering the layout styles -->
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;200;300;400;500;700;900&display=swap">
+  <link rel="stylesheet" href="{% static 'assets/css/fontawesome.min.css' %}">
+  <style>
+    .myBox {
+      height: 1000px;
+      overflow: scroll;
+    }
+  </style>
+  <!--
+    
+TemplateMo 559 Zay Shop
+
+https://templatemo.com/tm-559-zay-shop
+
+-->
+
+</head>
+
+<body>
+  {% if cartproducts %}
+  <div class="myBox">
+    <section class="h-100" style="background-color: #eee;">
+      <div class="container h-100 py-5">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+          <div class="col-10">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h3 class="fw-normal mb-0 text-black">Shopping Cart</h3>
+            </div>
+            {% for cartproduct in cartproducts %}
+
+            <div class="card rounded-3 mb-4">
+              <div class="card-body p-4">
+                <div class="row d-flex justify-content-between align-items-center">
+                  <div class="col-md-2 col-lg-2 col-xl-2">
+                    {% if cartproduct.product.product_image %}
+                    <img src="{{ cartproduct.product.product_image.url }}" class="img-fluid rounded-3"
+                      alt="{{ cartproduct.product.product_name }}">
+                    {% endif %}
+                  </div>
+                  <div class="col-md-3 col-lg-3 col-xl-3">
+                    <p class="lead fw-normal mb-2">{{ cartproduct.product.product_name }}</p>
+                  </div>
+                  <div class="col-md-3 col-lg-3 col-xl-2 d-flex">
+                    <form method="POST" action="{% url 'set_cart_product_quantity' cart_product_id=cartproduct.id %}">
+                      {% csrf_token %}
+                      <div class="quantity">
+                        <button name="setType" value="decrease" class="dec-btn p-0 ml-2"><i
+                            class="fas fa-minus"></i></button>
+                        <input class="form-control form-control-sm border-0 shadow-0 p-0" type="number"
+                          value="{{ cartproduct.quantity }}" />
+                        <button name="setType" value="increase" class="inc-btn p-0"><i class="fas fa-plus"></i></button>
+                      </div>
+                    </form>
+                  </div>
+                  <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
+                    {% load calculate %}
+                    <h5 class="mb-0">
+                      ${{ cartproduct.product.product_price | find_total:cartproduct.quantity}}</h5>
+                  </div>
+                  <div class="col-md-1 col-lg-1 col-xl-1 text-end">
+                    <form method="POST" action="{% url 'delete_cart_product' cart_product_id=cartproduct.id %}">
+                      {% csrf_token %}
+                      <button class="reset-anchor" type="submit"> <i
+                          class="fas fa-trash-alt small text-muted"></i></button>
+                    </form>
+                  </div>
+                  
+
+                </div>
+              </div>
+            </div>
+            
+
+            {% endfor %}
+            <h5 class="text-uppercase mb-4">Cart total</h5>
+            <ul class="list-unstyled mb-0">
+                <li class="d-flex align-items-center justify-content-between"><strong
+                        class="text-uppercase small font-weight-bold">Subtotal</strong><span
+                        class="text-muted small">${{cartTotal}}</span></li>
+                <li class="d-flex align-items-center justify-content-between"><strong
+                        class="text-uppercase small font-weight-bold">Shipping Charge</strong><span
+                        class="text-muted small">+ ${{shipping}}</span></li>
+                <li class="border-bottom my-2"></li>
+                <li class="d-flex align-items-center justify-content-between mb-4"><strong
+                        class="text-uppercase small font-weight-bold">Total</strong><span>${{ cartTotal | find_cart_total:shipping}}</span>
+                </li>
+            </ul>
+            <div class="card">
+              <div class="card-body">
+                <a href="{% url 'payment'%}">
+                  <button type="button" class="btn btn-warning btn-block btn-lg">Proceed to Pay</button>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+            
+  {% else %}
+  <div class="text-center py-5">
+    <h3 class="mb-3">Your cart is empty.</h3>
+    <a href="{% url 'home' %}"><i class="fas fa-long-arrow-alt-left mr-2"> </i>Continue shopping</a>
+  </div>
+  {% endif %}
+
+
+
+  <!-- Start Script -->
+  <script src="{% static 'assets/js/jquery-1.11.0.min.js' %}"></script>
+  <script src="{% static 'assets/js/jquery-migrate-1.2.1.min.js' %}"></script>
+  <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'assets/js/templatemo.js' %}"></script>
+  <script src="{% static 'assets/js/custom.js' %}"></script>
+  <!-- End Script -->
+
+</body>
+
+</html>
+{% endblock %}
